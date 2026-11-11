@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin | 5º Fórum Bilíngue do INES 2026</title>
+<style>
+  :root { --azul:#17478f; --azul-escuro:#0f3166; --laranja:#f7941d; --fundo:#f4f6fa; --texto:#1d2733; --suave:#5d6b7c; --borda:#d5dce6; --erro:#b3261e; --ok:#1a7f4b; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--fundo); color:var(--texto); line-height:1.5; }
+  header { background:var(--azul); color:#fff; padding:14px 20px; border-bottom:4px solid var(--laranja); display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  header h1 { font-size:1.1rem; margin:0; }
+  header button { background:transparent; border:1px solid rgba(255,255,255,.6); color:#fff; padding:6px 12px; width:auto; margin:0; }
+  main { max-width:1100px; margin:0 auto; padding:24px 16px 60px; }
+  .cartao { background:#fff; border:1px solid var(--borda); border-radius:14px; padding:22px; margin-bottom:22px; }
+  h2 { font-size:1.15rem; color:var(--azul); margin:0 0 14px; }
+  label { display:block; font-weight:600; font-size:.92rem; margin:14px 0 5px; }
+  input, textarea, select { width:100%; font:inherit; padding:10px 12px; border:1.5px solid var(--borda); border-radius:9px; background:#fff; color:inherit; }
+  input[type=color] { padding:3px; height:42px; }
+  textarea { min-height:150px; resize:vertical; }
+  input:focus, textarea:focus { outline:3px solid rgba(247,148,29,.45); border-color:var(--azul); }
+  button { font:inherit; font-weight:600; padding:10px 16px; border:0; border-radius:9px; background:var(--azul); color:#fff; cursor:pointer; }
+  button:hover { background:var(--azul-escuro); }
+  button.sec { background:#fff; color:var(--azul); border:1.5px solid var(--azul); }
+  button.sec:hover { background:#eef3fb; }
+  button.laranja { background:var(--laranja); color:#1d2733; }
+  button.mini { padding:5px 10px; font-size:.85rem; }
+  button:disabled { opacity:.55; cursor:wait; }
+  .duas { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; }
+  .quatro { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+  @media (max-width:860px) { .duas { grid-template-columns:1fr; } .quatro { grid-template-columns:1fr 1fr; } }
+  .acoes { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; align-items:center; }
+  .dica { font-size:.85rem; color:var(--suave); margin:6px 0 0; }
+  code { background:#eef1f6; padding:1px 5px; border-radius:5px; font-size:.9em; }
+  iframe { width:100%; aspect-ratio:1.414; border:1px solid var(--borda); border-radius:10px; background:#e9edf3; }
+  .msg { font-size:.92rem; }
+  .msg.erro { color:var(--erro); } .msg.ok { color:var(--ok); }
+  .tabela { overflow-x:auto; margin-top:14px; }
+  table { width:100%; border-collapse:collapse; font-size:.92rem; }
+  th, td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--borda); white-space:nowrap; }
+  td.nome { white-space:normal; min-width:180px; }
+  th { color:var(--suave); font-size:.8rem; text-transform:uppercase; letter-spacing:.03em; }
+  .selo { display:inline-block; padding:2px 9px; border-radius:99px; font-size:.8rem; font-weight:600; background:#fff3e0; color:#9a5a00; }
+  .selo.enviado { background:#e3f5ea; color:var(--ok); }
+  .selo.falha { background:#fdecea; color:var(--erro); }
+  .barra { height:8px; background:#e6eaf1; border-radius:99px; overflow:hidden; margin-top:12px; }
+  .barra div { height:100%; width:0; background:var(--laranja); transition:width .2s; }
+  #login { max-width:380px; margin:70px auto; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>5º Fórum Bilíngue do INES 2026 · Admin</h1>
+  <button id="sair" hidden>Sair</button>
+</header>
+
+<main>
+  <!-- LOGIN -->
+  <section id="login" class="cartao">
+    <h2>Acesso da secretaria</h2>
+    <form id="fLogin">
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" autocomplete="current-password" required>
+      <div class="acoes"><button id="bEntrar" type="submit">Entrar</button><span id="mLogin" class="msg erro"></span></div>
+    </form>
+  </section>
+
+  <div id="painel" hidden>
+    <!-- MODELO -->
+    <section class="cartao">
+      <h2>1. Modelo do certificado</h2>
+      <div class="duas">
+        <div>
+          <label for="arquivo">Imagem ou PDF do modelo (PDF, PNG ou JPG)</label>
+          <input id="arquivo" type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg">
+          <p class="dica" id="modeloAtual">Nenhum modelo salvo.</p>
+
+          <label for="evento">Tema do evento (<code>&lt;&lt;evento&gt;&gt;</code>)</label>
+          <input id="evento">
+
+          <label for="data">Data (<code>&lt;&lt;data&gt;&gt;</code>)</label>
+          <input id="data" placeholder="ex.: 25 de novembro de 2026">
+
+          <label for="texto">Texto do certificado</label>
+          <textarea id="texto"></textarea>
+          <p class="dica">Campos disponíveis: <code>&lt;&lt;nome&gt;&gt;</code>, <code>&lt;&lt;evento&gt;&gt;</code>, <code>&lt;&lt;data&gt;&gt;</code>, <code>&lt;&lt;cpf&gt;&gt;</code>. Nome e tema saem em negrito.</p>
+
+          <div class="quatro">
+            <div><label for="topo">Altura do texto (%)</label><input id="topo" type="number" min="0" max="95" step="1"></div>
+            <div><label for="margem">Margem lateral (%)</label><input id="margem" type="number" min="0" max="45" step="1"></div>
+            <div><label for="fonte">Tamanho da letra</label><input id="fonte" type="number" min="8" max="48" step="1"></div>
+            <div><label for="cor">Cor da letra</label><input id="cor" type="color"></div>
+          </div>
+
+          <div class="acoes">
+            <button id="bPrevia" class="sec" type="button">Pré-visualizar</button>
+            <button id="bSalvar" type="button">Salvar modelo</button>
+            <span id="mModelo" class="msg"></span>
+          </div>
+        </div>
+        <div>
+          <label>Pré-visualização (nome de exemplo)</label>
+          <iframe id="previa" title="Pré-visualização do certificado"></iframe>
+          <p class="dica">Ajuste a altura, a margem e o tamanho até o texto encaixar no modelo, e clique em Pré-visualizar de novo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSCRITOS -->
+    <section class="cartao">
+      <h2>2. Inscritos e envio dos certificados</h2>
+      <div class="acoes" style="margin-top:0">
+        <input id="busca" placeholder="Buscar por nome, e-mail ou CPF" style="max-width:320px">
+        <button id="bAtualizar" class="sec" type="button">Atualizar lista</button>
+        <button id="bEnviarTodos" class="laranja" type="button">Gerar e enviar para os pendentes</button>
+        <span id="resumo" class="msg"></span>
+      </div>
+      <div class="barra" id="barra" hidden><div></div></div>
+      <p id="mEnvio" class="msg"></p>
+      <div class="tabela">
+        <table>
+          <thead><tr><th>Nome</th><th>E-mail</th><th>CPF</th><th>Estado</th><th>Certificado</th><th>Ações</th></tr></thead>
+          <tbody id="corpo"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="../config.js"></script>
+
+<script id="gerador">
+/* Gera o PDF do certificado. modelo = { bytes: Uint8Array }, cfg = { texto, evento, data, topo, margem, fonte, cor }, pessoa = { nome, cpf } */
+function tipoDoArquivo(b) {
+  if (b[0] === 0x25 && b[1] === 0x50 && b[2] === 0x44 && b[3] === 0x46) return 'application/pdf';
+  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return 'image/png';
+  if (b[0] === 0xff && b[1] === 0xd8) return 'image/jpeg';
+  return null;
+}
+
+async function gerarCertificado(modelo, cfg, pessoa) {
+  const { PDFDocument, StandardFonts, rgb } = PDFLib;
+  const tipo = tipoDoArquivo(modelo.bytes);
+  if (!tipo) throw new Error('O modelo precisa ser PDF, PNG ou JPG.');
+
+  let doc, pagina;
+  if (tipo === 'application/pdf') {
+    doc = await PDFDocument.load(modelo.bytes);
+    while (doc.getPageCount() > 1) doc.removePage(1);
+    pagina = doc.getPage(0);
+  } else {
+    doc = await PDFDocument.create();
+    const img = tipo === 'image/png' ? await doc.embedPng(modelo.bytes) : await doc.embedJpg(modelo.bytes);
+    const L = 842, A = L * img.height / img.width;
+    pagina = doc.addPage([L, A]);
+    pagina.drawImage(img, { x: 0, y: 0, width: L, height: A });
+  }
+  doc.setTitle('Certificado - ' + pessoa.nome);
+
+  const normal = await doc.embedFont(StandardFonts.Helvetica);
+  const negrito = await doc.embedFont(StandardFonts.HelveticaBold);
+  const { width: L, height: A } = pagina.getSize();
+  const escala = L / 842;
+  const tam = Number(cfg.fonte) * escala;
+  const entrelinha = tam * 1.5;
+  const margem = L * Number(cfg.margem) / 100;
+  const largura = L - 2 * margem;
+  const h = String(cfg.cor || '#000000').replace('#', '');
+  const cor = rgb(parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255);
+
+  // A fonte padrão do PDF não tem todos os caracteres; troca os que faltam.
+  const seguro = (t, f) => Array.from(t).map(ch => {
+    try { f.encodeText(ch); return ch; } catch (e) {
+      const s = ch.normalize('NFD').replace(/[̀-ͯ]/g, '');
+      try { f.encodeText(s); return s; } catch (e2) { return '?'; }
+    }
+  }).join('');
+
+  const valores = { nome: pessoa.nome, evento: cfg.evento, data: cfg.data, cpf: pessoa.cpf };
+  const emNegrito = { nome: true, evento: true };
+
+  let y = A - A * Number(cfg.topo) / 100 - tam;
+  for (const paragrafo of String(cfg.texto).split('\n')) {
+    if (!paragrafo.trim()) { y -= entrelinha * 0.7; continue; }
+
+    // Quebra em palavras; cada palavra pode misturar trechos normais e em negrito.
+    const palavras = [];
+    let atual = [];
+    const fecha = () => { if (atual.length) { palavras.push(atual); atual = []; } };
+    for (const parte of paragrafo.split(/(<<\s*(?:nome|evento|data|cpf)\s*>>)/i)) {
+      const m = parte.match(/^<<\s*(nome|evento|data|cpf)\s*>>$/i);
+      const chave = m && m[1].toLowerCase();
+      const fonte = chave && emNegrito[chave] ? negrito : normal;
+      const txt = chave ? String(valores[chave] || '') : parte;
+      for (const pedaco of txt.split(/(\s+)/)) {
+        if (!pedaco) continue;
+        if (/^\s+$/.test(pedaco)) fecha();
+        else { const t = seguro(pedaco, fonte); atual.push({ t, fonte, w: fonte.widthOfTextAtSize(t, tam) }); }
+      }
+    }
+    fecha();
+
+    const espaco = normal.widthOfTextAtSize(' ', tam);
+    const linhas = [];
+    let linha = [], wLinha = 0;
+    for (const p of palavras) {
+      const w = p.reduce((s, x) => s + x.w, 0);
+      if (linha.length && wLinha + espaco + w > largura) { linhas.push({ linha, w: wLinha }); linha = []; wLinha = 0; }
+      wLinha += (linha.length ? espaco : 0) + w;
+      linha.push(p);
+    }
+    if (linha.length) linhas.push({ linha, w: wLinha });
+
+    for (const l of linhas) {
+      let x = margem + (largura - l.w) / 2;
+      l.linha.forEach((p, i) => {
+        if (i) x += espaco;
+        for (const pc of p) { pagina.drawText(pc.t, { x, y, size: tam, font: pc.fonte, color: cor }); x += pc.w; }
+      });
+      y -= entrelinha;
+    }
+  }
+  return doc.save();
+}
+</script>
+
+<script>
+const $ = id => document.getElementById(id);
+const PADRAO = {
+  evento: 'Tradução (d)e Literatura Negra Surda: entre línguas, corpos e visualidades',
+  data: '',
+  texto: 'Certificamos que <<nome>> participou do 5º Fórum Bilíngue do INES Online 2026, cujo tema foi "<<evento>>", realizado no dia <<data>>, com carga horária de 2 (duas) horas.\n\nRio de Janeiro, <<data>>.',
+  topo: 40, margem: 12, fonte: 18, cor: '#1d2733'
+};
+const CAMPOS = ['evento', 'data', 'texto', 'topo', 'margem', 'fonte', 'cor'];
+let senha = '';
+let modelo = null;        // { bytes, nome, novo }
+let inscritos = [];
+let enviando = false;
+let urlPrevia = null;
+
+/* ---------- utilidades ---------- */
+async function api(acao, dados) {
+  if (!/^https:\/\//.test(API_URL)) throw new Error('Cole a URL do Apps Script no arquivo config.js.');
+  const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(Object.assign({ acao, senha }, dados)) });
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.erro || 'Erro no servidor.');
+  return j;
+}
+function paraBase64(bytes) {
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+function deBase64(b64) {
+  const s = atob(b64), b = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) b[i] = s.charCodeAt(i);
+  return b;
+}
+function msg(id, texto, classe) { const e = $(id); e.textContent = texto; e.className = 'msg ' + (classe || ''); }
+function lerConfig() { const c = {}; CAMPOS.forEach(k => c[k] = $(k).value); return c; }
+function porConfig(c) { CAMPOS.forEach(k => $(k).value = (c && c[k] !== undefined && c[k] !== '') ? c[k] : PADRAO[k]); }
+function so(cpf) { return cpf.replace(/\D/g, ''); }
+function pronto() {
+  if (!modelo) throw new Error('Envie o modelo do certificado primeiro.');
+  const c = lerConfig();
+  if (!c.data.trim()) throw new Error('Preencha a data do evento.');
+  if (!c.evento.trim()) throw new Error('Preencha o tema do evento.');
+  return c;
+}
+
+/* ---------- login ---------- */
+async function entrar(s) {
+  senha = s;
+  const r = await api('listar');
+  inscritos = r.inscritos;
+  try { sessionStorage.setItem('fb_senha', senha); } catch (e) {}
+  $('login').hidden = true; $('painel').hidden = false; $('sair').hidden = false;
+  desenhar();
+  carregarModelo();
+}
+$('fLogin').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  $('bEntrar').disabled = true; msg('mLogin', '');
+  try { await entrar($('senha').value); }
+  catch (e) { senha = ''; msg('mLogin', e.message === 'Failed to fetch' ? 'Sem conexão com o servidor.' : e.message, 'erro'); }
+  $('bEntrar').disabled = false;
+});
+$('sair').addEventListener('click', () => { try { sessionStorage.removeItem('fb_senha'); } catch (e) {} location.reload(); });
+
+/* ---------- modelo ---------- */
+async function carregarModelo() {
+  porConfig(null);
+  try {
+    const r = await api('obterModelo');
+    porConfig(r.config);
+    if (r.modelo) {
+      modelo = { bytes: deBase64(r.modelo.base64), nome: r.modelo.nome, novo: false };
+      $('modeloAtual').textContent = 'Modelo salvo: ' + r.modelo.nome.replace(/^MODELO - /, '');
+      previa().catch(() => {});
+    }
+  } catch (e) { msg('mModelo', e.message, 'erro'); }
+}
+$('arquivo').addEventListener('change', async ev => {
+  const f = ev.target.files[0];
+  if (!f) return;
+  if (f.size > 8 * 1024 * 1024) { ev.target.value = ''; return msg('mModelo', 'Arquivo muito grande (máximo 8 MB).', 'erro'); }
+  const bytes = new Uint8Array(await f.arrayBuffer());
+  if (!tipoDoArquivo(bytes)) { ev.target.value = ''; return msg('mModelo', 'Use um arquivo PDF, PNG ou JPG.', 'erro'); }
+  modelo = { bytes, nome: f.name, novo: true };
+  $('modeloAtual').textContent = 'Novo modelo: ' + f.name + ' (ainda não salvo)';
+  msg('mModelo', '');
+  previa().catch(e => msg('mModelo', e.message, 'erro'));
+});
+async function previa() {
+  if (!modelo) throw new Error('Envie o modelo do certificado primeiro.');
+  const c = lerConfig();
+  if (!c.data.trim()) c.data = '(data do evento)';
+  const pdf = await gerarCertificado(modelo, c, { nome: 'Maria Aparecida de Souza Oliveira', cpf: '000.000.000-00' });
+  if (urlPrevia) URL.revokeObjectURL(urlPrevia);
+  urlPrevia = URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' }));
+  $('previa').src = urlPrevia + '#toolbar=0&view=Fit';
+}
+$('bPrevia').addEventListener('click', () => { msg('mModelo', ''); previa().catch(e => msg('mModelo', e.message, 'erro')); });
+$('bSalvar').addEventListener('click', async () => {
+  const b = $('bSalvar');
+  b.disabled = true; msg('mModelo', 'Salvando...');
+  try {
+    const dados = { config: lerConfig() };
+    if (modelo && modelo.novo) dados.modelo = { nome: modelo.nome, tipo: tipoDoArquivo(modelo.bytes), base64: paraBase64(modelo.bytes) };
+    await api('salvarModelo', dados);
+    if (modelo) { modelo.novo = false; $('modeloAtual').textContent = 'Modelo salvo: ' + modelo.nome.replace(/^MODELO - /, ''); }
+    msg('mModelo', 'Modelo salvo.', 'ok');
+  } catch (e) { msg('mModelo', e.message, 'erro'); }
+  b.disabled = false;
+});
+
+/* ---------- inscritos ---------- */
+function desenhar() {
+  const q = $('busca').value.trim().toLowerCase();
+  const qd = so(q);
+  const corpo = $('corpo');
+  corpo.textContent = '';
+  const lista = inscritos.filter(p => !q || p.nome.toLowerCase().includes(q) || p.email.toLowerCase().includes(q) || (qd && so(p.cpf).includes(qd)));
+  for (const p of lista) {
+    const tr = document.createElement('tr');
+    const td = (t, cls) => { const c = document.createElement('td'); c.textContent = t; if (cls) c.className = cls; tr.appendChild(c); return c; };
+    td(p.nome, 'nome'); td(p.email); td(p.cpf); td(p.estado);
+    const st = td('');
+    const selo = document.createElement('span');
+    const enviado = /^enviado/i.test(p.status);
+    selo.className = 'selo' + (enviado ? ' enviado' : p.falha ? ' falha' : '');
+    selo.textContent = p.falha ? 'Falhou' : p.status;
+    selo.title = p.falha || p.enviadoEm || '';
+    st.appendChild(selo);
+    const ac = td('');
+    const b1 = document.createElement('button'); b1.className = 'mini sec'; b1.textContent = 'Baixar PDF'; b1.onclick = () => baixar(p);
+    const b2 = document.createElement('button'); b2.className = 'mini'; b2.textContent = enviado ? 'Reenviar' : 'Enviar'; b2.style.marginLeft = '6px'; b2.onclick = () => enviarUm(p, b2);
+    ac.append(b1, b2);
+    corpo.appendChild(tr);
+  }
+  if (!lista.length) { const tr = document.createElement('tr'); const c = document.createElement('td'); c.colSpan = 6; c.textContent = inscritos.length ? 'Nada encontrado.' : 'Nenhuma inscrição ainda.'; tr.appendChild(c); corpo.appendChild(tr); }
+  const env = inscritos.filter(p => /^enviado/i.test(p.status)).length;
+  $('resumo').textContent = inscritos.length + ' inscritos · ' + env + ' enviados · ' + (inscritos.length - env) + ' pendentes';
+}
+$('busca').addEventListener('input', desenhar);
+$('bAtualizar').addEventListener('click', async () => {
+  $('bAtualizar').disabled = true;
+  try { inscritos = (await api('listar')).inscritos; desenhar(); msg('mEnvio', ''); }
+  catch (e) { msg('mEnvio', e.message, 'erro'); }
+  $('bAtualizar').disabled = false;
+});
+
+async function baixar(p) {
+  try {
+    const pdf = await gerarCertificado(modelo, pronto(), p);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' }));
+    a.download = so(p.cpf) + '.pdf';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  } catch (e) { msg('mEnvio', e.message, 'erro'); }
+}
+
+async function enviar(p, cfg) {
+  const pdf = await gerarCertificado(modelo, cfg, p);
+  const r = await api('enviarCertificado', { cpf: so(p.cpf), pdfBase64: paraBase64(pdf) });
+  p.status = 'Enviado'; p.enviadoEm = r.enviadoEm; p.falha = '';
+  return r;
+}
+
+async function enviarUm(p, botao) {
+  if (enviando) return;
+  let cfg;
+  try { cfg = pronto(); } catch (e) { return msg('mEnvio', e.message, 'erro'); }
+  if (/^enviado/i.test(p.status) && !confirm('O certificado já foi enviado para ' + p.nome + '. Enviar de novo?')) return;
+  enviando = true; botao.disabled = true; msg('mEnvio', 'Enviando para ' + p.email + '...');
+  try { await enviar(p, cfg); msg('mEnvio', 'Certificado enviado para ' + p.email + '.', 'ok'); }
+  catch (e) { p.falha = e.message; msg('mEnvio', 'Falha ao enviar para ' + p.nome + ': ' + e.message, 'erro'); }
+  enviando = false; desenhar();
+}
+
+$('bEnviarTodos').addEventListener('click', async () => {
+  if (enviando) return;
+  let cfg;
+  try { cfg = pronto(); } catch (e) { return msg('mEnvio', e.message, 'erro'); }
+  const fila = inscritos.filter(p => !/^enviado/i.test(p.status));
+  if (!fila.length) return msg('mEnvio', 'Não há certificados pendentes.', 'ok');
+  if (!confirm('Gerar e enviar ' + fila.length + ' certificado(s) por e-mail agora?')) return;
+
+  enviando = true; $('bEnviarTodos').disabled = true;
+  const barra = $('barra'); barra.hidden = false;
+  let ok = 0, falhas = 0;
+  for (let i = 0; i < fila.length; i++) {
+    const p = fila[i];
+    msg('mEnvio', 'Enviando ' + (i + 1) + ' de ' + fila.length + ': ' + p.nome + '. Não feche esta página.');
+    try { await enviar(p, cfg); ok++; }
+    catch (e) {
+      p.falha = e.message; falhas++;
+      if (/senha|quota|limite|Service invoked too many times/i.test(e.message)) { msg('mEnvio', 'Envio interrompido: ' + e.message, 'erro'); break; }
+    }
+    barra.firstElementChild.style.width = ((i + 1) / fila.length * 100) + '%';
+    desenhar();
+  }
+  enviando = false; $('bEnviarTodos').disabled = false;
+  desenhar();
+  if (!$('mEnvio').classList.contains('erro') || ok + falhas === fila.length)
+    msg('mEnvio', ok + ' certificado(s) enviado(s)' + (falhas ? ', ' + falhas + ' com falha (passe o mouse em "Falhou" para ver o motivo).' : '.'), falhas ? 'erro' : 'ok');
+});
+
+/* ---------- início ---------- */
+(async () => {
+  let s = '';
+  try { s = sessionStorage.getItem('fb_senha') || ''; } catch (e) {}
+  if (s) { try { await entrar(s); } catch (e) { senha = ''; } }
+})();
+</script>
+</body>
+</html>
